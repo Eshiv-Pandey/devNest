@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { BookOpen, MessageSquare, Calendar, Users, Bell, Search, Menu, X } from 'lucide-react';
+import { MessageSquare, Calendar, Users, Bell, Search, Menu, X } from 'lucide-react';
+import logoImage from '@/assets/logo.png';
 
 const navigationItems = [
-  { name: 'Course Updates', icon: BookOpen, href: '#courses' },
+  { name: 'Course Updates', icon: MessageSquare, href: '#courses' },
   { name: 'Anonymous Posts', icon: MessageSquare, href: '#anonymous' },
   { name: 'Events', icon: Calendar, href: '#events' },
   { name: 'Clubs', icon: Users, href: '#clubs' },
@@ -19,8 +20,12 @@ export const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-primary-foreground" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden">
+              <img 
+                src={logoImage} 
+                alt="CampusConnect Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               CampusConnect

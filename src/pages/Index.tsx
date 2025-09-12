@@ -3,6 +3,7 @@ import { HeroSection } from '@/components/ui/hero-section';
 import { FeatureCard } from '@/components/ui/feature-card';
 import { StatsSection } from '@/components/ui/stats-section';
 import { BookOpen, MessageSquare, Calendar, Users, Zap, Shield } from 'lucide-react';
+import logoImage from '@/assets/logo.png';
 
 const Index = () => {
   const courseUpdates = [
@@ -127,8 +128,12 @@ const Index = () => {
       <footer className="bg-card border-t border-border py-12">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-primary-foreground" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden">
+              <img 
+                src={logoImage} 
+                alt="CampusConnect Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <h3 className="text-xl font-bold">CampusConnect</h3>
           </div>

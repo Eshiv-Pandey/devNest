@@ -19,10 +19,11 @@
     --popover: 221 39% 11%;
     --popover-foreground: 247 250 255 1;
 
-    /* Brand Colors - Bright Academic Blue for Dark Theme */
-    --primary: 223 84% 55%;
+    /* Brand Colors - Teal from Logo */
+    --primary: 174 72% 56%;
     --primary-foreground: 221 39% 8%;
-    --primary-glow: 223 84% 65%;
+    --primary-glow: 174 72% 66%;
+    --primary-dark: 174 72% 46%;
 
     /* Secondary - Dark Academic */
     --secondary: 221 39% 15%;
@@ -32,25 +33,26 @@
     --muted: 221 39% 13%;
     --muted-foreground: 163 164 165 1;
 
-    /* Accent - Success Green */
-    --accent: 142 76% 46%;
+    /* Accent - Complementary Orange */
+    --accent: 31 82% 56%;
     --accent-foreground: 221 39% 8%;
 
     /* Alert Colors */
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 247 250 255 1;
-    --warning: 43 96% 66%;
+    --warning: 48 96% 66%;
     --warning-foreground: 221 39% 8%;
 
     /* Form Elements */
     --border: 221 39% 20%;
     --input: 221 39% 15%;
-    --ring: 223 84% 55%;
+    --ring: 174 72% 56%;
 
-    /* Gradients for Dark Theme */
-    --gradient-primary: linear-gradient(135deg, hsl(223 84% 55%), hsl(223 84% 65%));
+    /* Gradients with Teal Theme */
+    --gradient-primary: linear-gradient(135deg, hsl(174 72% 56%), hsl(174 72% 66%));
     --gradient-hero: linear-gradient(135deg, hsl(221 39% 8%), hsl(221 39% 11%));
     --gradient-card: linear-gradient(145deg, hsl(221 39% 11% / 0.9), hsl(221 39% 13% / 0.5));
+    --gradient-logo: linear-gradient(135deg, hsl(174 72% 46%), hsl(174 72% 56%));
 
     /* Shadows for Dark Theme */
     --shadow-soft: 0 4px 16px hsl(0 0% 0% / 0.4);
@@ -77,9 +79,10 @@
     --popover: 255 255 255 1;
     --popover-foreground: 221 39% 11%;
 
-    --primary: 223 84% 28%;
+    --primary: 174 72% 46%;
     --primary-foreground: 255 255 255 1;
-    --primary-glow: 223 84% 45%;
+    --primary-glow: 174 72% 56%;
+    --primary-dark: 174 72% 36%;
 
     --secondary: 245 248 255 1;
     --secondary-foreground: 221 39% 11%;
@@ -87,19 +90,19 @@
     --muted: 243 244 246 1;
     --muted-foreground: 115 116 117 1;
 
-    --accent: 142 76% 36%;
+    --accent: 31 82% 46%;
     --accent-foreground: 255 255 255 1;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 255 255 255 1;
-    --warning: 43 96% 56%;
+    --warning: 48 96% 56%;
     --warning-foreground: 221 39% 11%;
 
     --border: 223 13% 88%;
     --input: 243 244 246 1;
-    --ring: 223 84% 28%;
+    --ring: 174 72% 46%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(223 84% 28%), hsl(223 84% 45%));
+    --gradient-primary: linear-gradient(135deg, hsl(174 72% 46%), hsl(174 72% 56%));
     --gradient-hero: linear-gradient(135deg, hsl(247 250 255), hsl(245 248 255));
     --gradient-card: linear-gradient(145deg, hsl(255 255 255 / 0.9), hsl(245 248 255 / 0.5));
 
