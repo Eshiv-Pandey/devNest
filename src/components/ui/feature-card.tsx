@@ -1,5 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 
 interface FeatureCardProps {
@@ -60,8 +61,9 @@ export const FeatureCard = ({
 
         <Button 
           className="w-full gradient-primary text-primary-foreground shadow-card group-hover:shadow-hover transition-smooth"
+          asChild
         >
-          {buttonText}
+          <Link to="/course-updates">{buttonText}</Link>
         </Button>
       </CardContent>
     </Card>
