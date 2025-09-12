@@ -29,8 +29,8 @@ export const Navigation = () => {
             </div>
             <h1 className="text-xl font-bold">
               <span className="text-logo-gray">dev</span>
-              <span className="text-primary">Nes</span>
-              <span className="text-logo-orange">t</span>
+              <span className="text-primary">Ne</span>
+              <span className="text-logo-orange">st</span>
             </h1>
           </div>
 
