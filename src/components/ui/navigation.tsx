@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { MessageSquare, Calendar, Users, Bell, Search, Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import logoImage from '@/assets/logo.png';
 
 const navigationItems = [
@@ -57,8 +58,8 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm">
               <Search className="w-4 h-4" />
             </Button>
-            <Button className="gradient-primary text-primary-foreground shadow-soft">
-              Sign In
+            <Button className="gradient-primary text-primary-foreground shadow-soft" asChild>
+              <Link to="/auth">Sign In</Link>
             </Button>
           </div>
 
@@ -89,8 +90,8 @@ export const Navigation = () => {
                 </a>
               ))}
               <div className="px-4 pt-4 border-t border-border">
-                <Button className="w-full gradient-primary text-primary-foreground">
-                  Sign In
+                <Button className="w-full gradient-primary text-primary-foreground" asChild>
+                  <Link to="/auth">Sign In</Link>
                 </Button>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Users, MessageCircle, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import heroImage from '@/assets/college-hero.jpg';
 
 const stats = [
@@ -40,9 +41,12 @@ export const HeroSection = () => {
             <Button 
               size="lg" 
               className="gradient-primary text-primary-foreground shadow-hover transition-bounce group"
+              asChild
             >
-              Get Started
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-smooth" />
+              <Link to="/auth">
+                Get Started
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-smooth" />
+              </Link>
             </Button>
             <Button 
               size="lg" 
