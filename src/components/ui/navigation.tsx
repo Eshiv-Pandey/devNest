@@ -20,7 +20,7 @@ export const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden">
+            <div className="w-10 h-10 rounded-full overflow-hidden">
               <img 
                 src={logoImage} 
                 alt="devNest Logo" 
