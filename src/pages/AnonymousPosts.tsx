@@ -20,10 +20,23 @@ import {
   Flame,
   ThumbsUp,
   MoreHorizontal,
-  X
+  X,
+  Image as ImageIcon,
+  Video,
+  FileText,
+  BarChart3,
+  Upload
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logoImage from '@/assets/logo.png';
+
+interface Poll {
+  question: string;
+  options: { id: string; text: string; votes: number }[];
+  totalVotes: number;
+  userVote?: string;
+  endsAt: string;
+}
 
 interface Post {
   id: string;
@@ -41,6 +54,10 @@ interface Post {
   reported: boolean;
   userVote?: 'up' | 'down' | null;
   trending: boolean;
+  images?: string[];
+  videos?: string[];
+  pdfs?: { name: string; url: string }[];
+  poll?: Poll;
 }
 
 interface Comment {
@@ -132,6 +149,12 @@ const AnonymousPosts = () => {
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [showRepostDialog, setShowRepostDialog] = useState<string | null>(null);
   const [repostThoughts, setRepostThoughts] = useState('');
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [uploadedVideos, setUploadedVideos] = useState<string[]>([]);
+  const [uploadedPdfs, setUploadedPdfs] = useState<{ name: string; url: string }[]>([]);
+  const [showPollCreator, setShowPollCreator] = useState(false);
+  const [pollQuestion, setPollQuestion] = useState('');
+  const [pollOptions, setPollOptions] = useState(['', '']);
   const { toast } = useToast();
 
   const anonymousNames = [
@@ -149,8 +172,54 @@ const AnonymousPosts = () => {
     return matches ? matches.map(tag => tag.slice(1)) : [];
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' | 'pdf') => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      const url = URL.createObjectURL(file);
+      
+      if (type === 'image') {
+        setUploadedImages(prev => [...prev, url]);
+      } else if (type === 'video') {
+        setUploadedVideos(prev => [...prev, url]);
+      } else if (type === 'pdf') {
+        setUploadedPdfs(prev => [...prev, { name: file.name, url }]);
+      }
+    });
+
+    toast({
+      title: "File uploaded!",
+      description: `${type} added to your post.`,
+    });
+  };
+
+  const handleCreatePoll = () => {
+    if (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) {
+      toast({
+        title: "Invalid poll",
+        description: "Please add a question and at least 2 options.",
+        variant: "destructive"
+      });
+      return;
+    }
+    return {
+      question: pollQuestion,
+      options: pollOptions.filter(o => o.trim()).map((text, i) => ({
+        id: `opt-${i}`,
+        text,
+        votes: 0
+      })),
+      totalVotes: 0,
+      endsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    };
+  };
+
   const handleCreatePost = () => {
-    if (!newPostContent.trim()) return;
+    if (!newPostContent.trim() && uploadedImages.length === 0 && uploadedVideos.length === 0 && !showPollCreator) return;
+
+    const poll = showPollCreator ? handleCreatePoll() : undefined;
+    if (showPollCreator && !poll) return;
 
     const newPost: Post = {
       id: Date.now().toString(),
@@ -163,17 +232,52 @@ const AnonymousPosts = () => {
       reposts: 0,
       tags: extractTags(newPostContent),
       reported: false,
-      trending: false
+      trending: false,
+      images: uploadedImages.length > 0 ? uploadedImages : undefined,
+      videos: uploadedVideos.length > 0 ? uploadedVideos : undefined,
+      pdfs: uploadedPdfs.length > 0 ? uploadedPdfs : undefined,
+      poll
     };
 
     setPosts([newPost, ...posts]);
     setNewPostContent('');
+    setUploadedImages([]);
+    setUploadedVideos([]);
+    setUploadedPdfs([]);
+    setShowPollCreator(false);
+    setPollQuestion('');
+    setPollOptions(['', '']);
     setShowCreatePost(false);
     
     toast({
       title: "Post created!",
       description: "Your anonymous post has been shared with the community.",
     });
+  };
+
+  const handlePollVote = (postId: string, optionId: string) => {
+    setPosts(posts.map(post => {
+      if (post.id === postId && post.poll) {
+        const poll = post.poll;
+        if (poll.userVote) {
+          // Remove previous vote
+          poll.options = poll.options.map(opt => 
+            opt.id === poll.userVote ? { ...opt, votes: opt.votes - 1 } : opt
+          );
+          poll.totalVotes--;
+        }
+        
+        // Add new vote
+        poll.options = poll.options.map(opt =>
+          opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt
+        );
+        poll.totalVotes++;
+        poll.userVote = optionId;
+        
+        return { ...post, poll: { ...poll } };
+      }
+      return post;
+    }));
   };
 
   const handleVote = (postId: string, voteType: 'up' | 'down') => {
@@ -378,7 +482,156 @@ const AnonymousPosts = () => {
                   className="min-h-24 resize-none"
                   maxLength={280}
                 />
+
+                {/* Media Attachments */}
+                <div className="flex flex-wrap gap-2">
+                  {uploadedImages.map((img, i) => (
+                    <div key={i} className="relative group">
+                      <img src={img} alt="" className="w-20 h-20 object-cover rounded-lg" />
+                      <button
+                        onClick={() => setUploadedImages(prev => prev.filter((_, idx) => idx !== i))}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {uploadedVideos.map((vid, i) => (
+                    <div key={i} className="relative group">
+                      <video src={vid} className="w-20 h-20 object-cover rounded-lg" />
+                      <button
+                        onClick={() => setUploadedVideos(prev => prev.filter((_, idx) => idx !== i))}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {uploadedPdfs.map((pdf, i) => (
+                    <div key={i} className="relative group flex items-center gap-2 bg-secondary px-3 py-2 rounded-lg">
+                      <FileText className="w-4 h-4" />
+                      <span className="text-xs">{pdf.name}</span>
+                      <button
+                        onClick={() => setUploadedPdfs(prev => prev.filter((_, idx) => idx !== i))}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Poll Creator */}
+                {showPollCreator && (
+                  <div className="space-y-3 p-4 bg-secondary/50 rounded-lg">
+                    <input
+                      type="text"
+                      placeholder="Poll question..."
+                      value={pollQuestion}
+                      onChange={(e) => setPollQuestion(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                    />
+                    {pollOptions.map((opt, i) => (
+                      <div key={i} className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder={`Option ${i + 1}`}
+                          value={opt}
+                          onChange={(e) => {
+                            const newOpts = [...pollOptions];
+                            newOpts[i] = e.target.value;
+                            setPollOptions(newOpts);
+                          }}
+                          className="flex-1 px-3 py-2 bg-background border border-border rounded-md"
+                        />
+                        {i >= 2 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setPollOptions(pollOptions.filter((_, idx) => idx !== i))}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    {pollOptions.length < 4 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPollOptions([...pollOptions, ''])}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add option
+                      </Button>
+                    )}
+                  </div>
+                )}
                 
+                {/* Media Upload Buttons */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleFileUpload(e, 'image')}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label htmlFor="image-upload">
+                    <Button variant="outline" size="sm" className="cursor-pointer" asChild>
+                      <span>
+                        <ImageIcon className="w-4 h-4 mr-2" />
+                        Image
+                      </span>
+                    </Button>
+                  </label>
+
+                  <input
+                    type="file"
+                    accept="video/*"
+                    multiple
+                    onChange={(e) => handleFileUpload(e, 'video')}
+                    className="hidden"
+                    id="video-upload"
+                  />
+                  <label htmlFor="video-upload">
+                    <Button variant="outline" size="sm" className="cursor-pointer" asChild>
+                      <span>
+                        <Video className="w-4 h-4 mr-2" />
+                        Video
+                      </span>
+                    </Button>
+                  </label>
+
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    multiple
+                    onChange={(e) => handleFileUpload(e, 'pdf')}
+                    className="hidden"
+                    id="pdf-upload"
+                  />
+                  <label htmlFor="pdf-upload">
+                    <Button variant="outline" size="sm" className="cursor-pointer" asChild>
+                      <span>
+                        <FileText className="w-4 h-4 mr-2" />
+                        PDF
+                      </span>
+                    </Button>
+                  </label>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPollCreator(!showPollCreator)}
+                    className={showPollCreator ? 'bg-primary/10' : ''}
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Poll
+                  </Button>
+                </div>
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
                     {newPostContent.length}/280 characters
@@ -390,6 +643,10 @@ const AnonymousPosts = () => {
                       onClick={() => {
                         setShowCreatePost(false);
                         setNewPostContent('');
+                        setUploadedImages([]);
+                        setUploadedVideos([]);
+                        setUploadedPdfs([]);
+                        setShowPollCreator(false);
                       }}
                     >
                       Cancel
@@ -397,7 +654,7 @@ const AnonymousPosts = () => {
                     <Button
                       size="sm"
                       onClick={handleCreatePost}
-                      disabled={!newPostContent.trim()}
+                      disabled={!newPostContent.trim() && uploadedImages.length === 0 && uploadedVideos.length === 0 && !showPollCreator}
                       className="gradient-primary text-primary-foreground"
                     >
                       <Send className="w-4 h-4 mr-2" />
@@ -461,6 +718,90 @@ const AnonymousPosts = () => {
                 {/* Post Content */}
                 <div className={post.isRepost ? 'ml-4 pl-4 border-l-2 border-border' : ''}>
                   <p className="text-foreground mb-4 leading-relaxed">{post.content}</p>
+
+                  {/* Images */}
+                  {post.images && post.images.length > 0 && (
+                    <div className={`grid gap-2 mb-4 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                      {post.images.map((img, i) => (
+                        <img key={i} src={img} alt="" className="w-full rounded-lg object-cover max-h-96" />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Videos */}
+                  {post.videos && post.videos.length > 0 && (
+                    <div className="space-y-2 mb-4">
+                      {post.videos.map((vid, i) => (
+                        <video key={i} src={vid} controls className="w-full rounded-lg max-h-96" />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* PDFs */}
+                  {post.pdfs && post.pdfs.length > 0 && (
+                    <div className="space-y-2 mb-4">
+                      {post.pdfs.map((pdf, i) => (
+                        <a
+                          key={i}
+                          href={pdf.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 p-3 bg-secondary hover:bg-secondary/80 rounded-lg transition-colors"
+                        >
+                          <FileText className="w-5 h-5 text-primary" />
+                          <span className="text-sm font-medium">{pdf.name}</span>
+                          <Upload className="w-4 h-4 ml-auto" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Poll */}
+                  {post.poll && (
+                    <div className="mb-4 p-4 bg-secondary/50 rounded-lg space-y-3">
+                      <p className="font-medium">{post.poll.question}</p>
+                      <div className="space-y-2">
+                        {post.poll.options.map((opt) => {
+                          const percentage = post.poll!.totalVotes > 0 
+                            ? (opt.votes / post.poll!.totalVotes) * 100 
+                            : 0;
+                          const isVoted = post.poll!.userVote === opt.id;
+                          
+                          return (
+                            <button
+                              key={opt.id}
+                              onClick={() => handlePollVote(post.id, opt.id)}
+                              className={`w-full text-left p-3 rounded-lg border transition-all ${
+                                isVoted 
+                                  ? 'border-primary bg-primary/10' 
+                                  : 'border-border hover:border-primary/50'
+                              }`}
+                            >
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-sm font-medium">{opt.text}</span>
+                                {post.poll!.userVote && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {percentage.toFixed(0)}%
+                                  </span>
+                                )}
+                              </div>
+                              {post.poll!.userVote && (
+                                <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-primary transition-all duration-300"
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {post.poll.totalVotes} votes • Ends {new Date(post.poll.endsAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
                   
                   {/* Tags */}
                   {post.tags.length > 0 && (
