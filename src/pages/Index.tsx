@@ -92,6 +92,7 @@ const Index = () => {
               posts={upcomingEvents}
               className="animate-slideUp"
               style={{ animationDelay: '0.4s' }}
+              href="/events"
             />
           </div>
 

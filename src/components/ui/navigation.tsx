@@ -7,8 +7,8 @@ import logoImage from '@/assets/logo.png';
 
 const navigationItems = [
   { name: 'Course Updates', icon: MessageSquare, href: '/course-updates' },
-  { name: 'Anonymous Posts', icon: MessageSquare, href: '/anonymous-posts' },
-  { name: 'Events', icon: Calendar, href: '#events' },
+  { name: 'Community', icon: MessageSquare, href: '/anonymous-posts' },
+  { name: 'Events', icon: Calendar, href: '/events' },
   { name: 'Clubs', icon: Users, href: '#clubs' },
 ];
 
